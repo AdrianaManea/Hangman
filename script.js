@@ -1,5 +1,5 @@
 const wordEl = document.getElementById('word');
-const wrongLettersEl = document.getElementById('wrong-letter');
+const wrongLettersEl = document.getElementById('wrong-letters');
 const playAgainBtn = document.getElementById('play-again');
 const popup = document.getElementById('popup-container');
 const notification = document.getElementById('notification-container');
@@ -27,7 +27,6 @@ const wrongLetters = [];
 // then we check to see if wordEl.innerText matches the selecteWord
 // if it does it means we've guessed the word and the popup displays
 
-
 function displayWord() {
   // if the current letter we're looping through included in corectLetters
   // ? if so, show letter
@@ -54,8 +53,30 @@ function displayWord() {
 }
 
 // Update the wrong letters
-function updateWrondLettersEl() {
-  console.log('Update wrong');
+function updateWrongLettersEl() {
+
+  // Display wrong letter
+  wrongLettersEl.innerHTML = `
+    ${wrongLetters.length > 0 ? '<p>Wrong Letters</p>' : ''}
+    ${wrongLetters.map(letter => `<span>${letter}</span>`)}
+  `;
+
+  // Display parts
+  figureParts.forEach((part, index) => {
+    const errors = wrongLetters.length;
+
+    if (index < errors) {
+      part.style.display = 'block';
+    } else {
+      part.style.display = 'none';
+    }
+  });
+
+  // Check if lost
+  if (wrongLetters.length === figureParts.length) {
+    finalMessage.innerText = 'Unfortunately you lost! 😟';
+    popup.style.display = 'flex';
+  }
 }
 
 // Show notification
@@ -68,9 +89,10 @@ function showNotification() {
   }, 2000);
 }
 
+
+//Event Listeners
+
 // Keydown letter press event handler
-// fire off when we hit a letter
-// letter from a to z = 65 to 90
 window.addEventListener('keydown', e => {
   // console.log(e.keyCode);
   if (e.keyCode >= 65 && e.keyCode <= 90) {
@@ -88,12 +110,29 @@ window.addEventListener('keydown', e => {
       if (!wrongLetters.includes(letter)) {
         wrongLetters.push(letter);
 
-        updateWrondLettersEl();
+        updateWrongLettersEl();
       } else {
         showNotification();
       }
     }
   }
 });
+
+
+// Restart game and play again
+playAgainBtn.addEventListener('click', () => {
+  // Empty arrays
+  correctLetters.splice(0);
+  wrongLetters.splice(0);
+
+  selectedWord = words[Math.floor(Math.random() * words.length)];
+
+  displayWord();
+
+  updateWrongLettersEl();
+
+  popup.style.display = 'none';
+});
+
 
 displayWord();
